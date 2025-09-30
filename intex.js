@@ -3,7 +3,7 @@
     
     // Authorized users database
     const authorizedUsers = [
-      { email: "support@amastor.com", phone: "+919876543210", name: "Support Agent 1" },
+      { email: "support@amastor.com", phone: "+919876543210", name: "Sarfaraz" },
       { email: "admin@amastor.com", phone: "+919876543211", name: "Admin User" },
       { email: "agent@amastor.com", phone: "+919876543212", name: "Support Agent 2" },
     ];
