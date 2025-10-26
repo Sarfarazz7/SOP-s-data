@@ -1,0 +1,443 @@
+/* style.css */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      background: linear-gradient(135deg, #fff 0%, #e74c3c 100%);
+    }
+
+    #authScreen {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #fff 0%, #e74c3c 100%);
+    }
+
+    .auth-container {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(231, 76, 60, 0.3);
+      width: 90%;
+      max-width: 400px;
+      animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-container h2 {
+      color: #e74c3c;
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 28px;
+    }
+
+    .auth-container p {
+      color: #666;
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 14px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .input-group input:focus {
+      outline: none;
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(231, 76, 60, 0.3);
+      background: #c0392b;
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 14px;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .success-message {
+      color: #27ae60;
+      font-size: 14px;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+
+    .otp-container {
+      display: none;
+    }
+
+    .otp-inputs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .otp-input {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .otp-input:focus {
+      outline: none;
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    .resend-link {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+    }
+
+    .resend-link a {
+      color: #e74c3c;
+      text-decoration: none;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .resend-link a:hover {
+      text-decoration: underline;
+    }
+
+    #appScreen {
+      display: none;
+      height: 100vh;
+    }
+
+    .app-header {
+      background: #e74c3c;
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .app-header h1 {
+      font-size: 24px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logout-btn {
+      padding: 8px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid white;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .logout-btn:hover {
+      background: white;
+      color: #e74c3c;
+    }
+
+    .app-content {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    #mainContent {
+      flex: 2;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f5f5f5;
+    }
+
+    #sidebar {
+      flex: 1;
+      border-left: 2px solid #e0e0e0;
+      padding: 20px;
+      background-color: #fff;
+      max-width: 400px;
+      overflow-y: auto;
+    }
+
+    #greeting {
+      font-weight: bold;
+      margin-bottom: 15px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    .search-box {
+      width: 100%;
+      max-width: 500px;
+      margin-bottom: 20px;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    select {
+      margin-top: 10px;
+      width: 100%;
+      max-width: 320px;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #e74c3c;
+    }
+
+    #instruction {
+      margin-top: 20px;
+      white-space: pre-line;
+      font-size: 15px;
+      line-height: 1.6;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .workflow-section {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .workflow-section h3 {
+      color: #e74c3c;
+      margin-bottom: 15px;
+      font-size: 18px;
+      border-bottom: 2px solid #e74c3c;
+      padding-bottom: 10px;
+    }
+
+    .copy-btn {
+      background: #27ae60;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 10px;
+      transition: all 0.3s;
+    }
+
+    .copy-btn:hover {
+      background: #229954;
+      transform: translateY(-2px);
+    }
+
+    .conditional-dropdown {
+      margin: 15px 0;
+      padding: 15px;
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+      border-radius: 8px;
+    }
+
+    .li-factor {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+
+    .customer-factor {
+      color: #3498db;
+      font-weight: bold;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      color: #e74c3c;
+      margin-bottom: 10px;
+    }
+
+    .script-block {
+      background: #f8f9fa;
+      border-left: 4px solid #e74c3c;
+      margin-bottom: 15px;
+      padding: 15px;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .script-block:hover {
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.15);
+      transform: translateX(5px);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    input[type="number"],
+    select.sidebar-input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    button#calculateBtn {
+      padding: 10px 20px;
+      cursor: pointer;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    button#calculateBtn:hover {
+      background: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+    }
+
+    #calc-result {
+      font-weight: bold;
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      color: #333;
+    }
+
+    .email-template {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      font-family: monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+
+    .tagging-info {
+      background: #e8f5e9;
+      padding: 10px;
+      border-radius: 6px;
+      margin: 10px 0;
+      color: #2e7d32;
+      font-weight: 500;
+    }
+
+    .action-workflow {
+      background: #fff3cd;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+      border-left: 4px solid #ffc107;
+    }
+
+    .action-workflow ul {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .action-workflow li {
+      margin: 5px 0;
+    }

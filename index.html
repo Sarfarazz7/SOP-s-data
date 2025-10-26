@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Saifu Creation </title>
+  <link rel="stylesheet" href="style.css">
+  
+</head>
+
+<body>
+  <!-- Authentication Screen -->
+  <div id="authScreen">
+    <div class="auth-container">
+      <div id="loginForm">
+        <h2>🔐 Welcome Back</h2>
+        <p>Please enter your credentials to continue</p>
+
+        <div class="input-group">
+          <label for="emailInput">Email Address</label>
+          <input type="email" id="emailInput" placeholder="your.email@example.com" />
+        </div>
+
+        <div class="input-group">
+          <label for="phoneInput">Phone Number</label>
+          <input type="tel" id="phoneInput" placeholder="+91 9876543210" />
+        </div>
+
+        <button class="btn" id="sendOtpBtn">Send OTP</button>
+
+        <div class="error-message" id="loginError"></div>
+        <div class="success-message" id="loginSuccess"></div>
+      </div>
+
+      <div class="otp-container" id="otpForm">
+        <h2>🔑 Verify OTP</h2>
+        <p>Enter the 6-digit code sent to your email</p>
+
+        <div class="otp-inputs">
+          <input type="text" maxlength="1" class="otp-input" data-index="0" />
+          <input type="text" maxlength="1" class="otp-input" data-index="1" />
+          <input type="text" maxlength="1" class="otp-input" data-index="2" />
+          <input type="text" maxlength="1" class="otp-input" data-index="3" />
+          <input type="text" maxlength="1" class="otp-input" data-index="4" />
+          <input type="text" maxlength="1" class="otp-input" data-index="5" />
+        </div>
+
+        <button class="btn" id="verifyOtpBtn">Verify OTP</button>
+
+        <div class="resend-link">
+          <a id="resendOtpLink">Resend OTP</a>
+        </div>
+
+        <div class="error-message" id="otpError"></div>
+        <div class="success-message" id="otpSuccess"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Application Screen -->
+  <div id="appScreen">
+    <div class="app-header">
+      <h1>licious</h1>
+      <div class="user-info">
+        <span id="userEmail"></span>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+    </div>
+
+    <div class="app-content">
+      <div id="mainContent">
+        <div id="greeting"></div>
+        
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search SOPs, scripts, workflows..." />
+        
+        <select id="mainGroup" style="display:none;"></select>
+        <select id="subGroup" style="display:none;"></select>
+        <div id="conditionalOptions"></div>
+        <div id="instruction"></div>
+        <div id="workflowOutput"></div>
+      </div>
+
+      <div id="sidebar">
+        <h2>Quick Tools</h2>
+
+        <h3>Egg Damage Calculator</h3>
+
+        <label for="orderValue">Order Value (₹)</label>
+        <input type="number" id="orderValue" placeholder="Enter order value" min="0" step="0.01" />
+
+        <label for="packageOption">Package Option</label>
+        <select id="packageOption" class="sidebar-input">
+          <option value="6">6 Eggs</option>
+          <option value="12">12 Eggs</option>
+          <option value="30">30 Eggs</option>
+        </select>
+
+        <label for="damagedEggs">Number of Damaged Eggs</label>
+        <input type="number" id="damagedEggs" placeholder="Enter number of damaged eggs" min="0" />
+
+        <button id="calculateBtn">Calculate Refund</button>
+        <div id="calc-result"></div>
+
+        <h2 style="margin-top: 30px;">Important Scripts</h2>
+
+        <div class="script-block">
+          <h3>Halal Script</h3>
+          <p>Licious sources its fresh produce from trusted partners who operate or manage government-approved
+            slaughterhouses, adhering strictly to the guidelines set by the relevant local or administrative
+            authorities. Licious itself does not engage in the slaughter of animals.
+
+            Our role involves processing and packaging a variety of meat and seafood products at our state-of-the-art
+            facilities, which are certified with the highest standards of food safety and quality — FSSC 22000.</p>
+          <button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy</button>
+        </div>
+
+        <div class="script-block">
+          <h3>Prawns Cleaning Script</h3>
+          <p>At Licious, during the cleaning process of deveined prawns, only the intestinal tract (sand vein) along the
+            top of the body is removed. The ventral vein, located on the underside of the prawn, is not removed, as it
+            is safe for consumption.</p>
+          <button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy</button>
+        </div>
+
+        <div class="script-block">
+          <h3>Cancellation Fee Script</h3>
+          <p>We charge a cancellation fee because once an order is placed, we may have already started preparing your
+            shipment or our delivery team could be on the way. Cancelling after the grace period causes disruptions to
+            our operations and affects our delivery partners. It can also lead to food waste. To keep things fair and
+            sustainable, we ask that you only cancel if necessary. We do offer a grace period to make things easier.
+            Thanks for your understanding and support!</p>
+          <button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy</button>
+        </div>
+
+        <div class="script-block">
+          <h3>COD Stop Script</h3>
+          <p>We're moving fully to digital payments for a smoother delivery and payment experience, so Licious no longer
+            accepts cash on delivery</p>
+          <button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy</button>
+        </div>
+
+        <div class="script-block">
+          <h3>Infinity Subscription</h3>
+          <p>"Our Infinity Subscription is very beneficial for getting up to 5% cashback in every transaction..get free
+            delivery in every order..and you can save over 100rs in 1 month also all the cash back will be credited in
+            licious wallet...even After infinity over you can use it within 30 days"</p>
+          <button class="copy-btn" onclick="copyToClipboard(this.previousElementSibling.textContent)">Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ <script src="intex.js"></script>
+</body>
+
+</html>

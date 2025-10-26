@@ -1,0 +1,839 @@
+// Authorized users database (stored securely in code)
+    const authorizedUsers = [
+      { email: "support@amastor.com", phone: "+919876543210", name: "Support Agent 1" },
+      { email: "admin@amastor.com", phone: "+919876543211", name: "Admin User" },
+      { email: "agent@amastor.com", phone: "+919876543212", name: "Support Agent 2" },
+      // Add more authorized users here
+    ];
+
+    // Session state (stored in memory)
+    let currentUser = null;
+    let currentOTP = null;
+    let otpEmail = null;
+
+    // Generate random 6-digit OTP
+    function generateOTP() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    // Validate email and phone
+    function validateCredentials(email, phone) {
+      return authorizedUsers.find(user => 
+        user.email.toLowerCase() === email.toLowerCase() && 
+        user.phone === phone
+      );
+    }
+
+    // Authentication Logic
+    document.getElementById('sendOtpBtn').addEventListener('click', function() {
+      const email = document.getElementById('emailInput').value.trim();
+      const phone = document.getElementById('phoneInput').value.trim();
+      const errorDiv = document.getElementById('loginError');
+      const successDiv = document.getElementById('loginSuccess');
+
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      if (!email || !phone) {
+        errorDiv.textContent = 'Please enter both email and phone number';
+        errorDiv.style.display = 'block';
+        return;
+      }
+
+      const user = validateCredentials(email, phone);
+      
+      if (user) {
+        currentOTP = generateOTP();
+        otpEmail = email;
+        
+        // In production, send OTP via email service
+        console.log('OTP for ' + email + ': ' + currentOTP);
+        alert('OTP Generated: ' + currentOTP + '\n(In production, this will be sent via email)');
+        
+        successDiv.textContent = 'OTP sent to your email!';
+        successDiv.style.display = 'block';
+        
+        // Show OTP form
+        setTimeout(() => {
+          document.getElementById('loginForm').style.display = 'none';
+          document.getElementById('otpForm').style.display = 'block';
+        }, 1000);
+      } else {
+        errorDiv.textContent = 'Invalid credentials. Access denied.';
+        errorDiv.style.display = 'block';
+      }
+    });
+
+    // OTP Input Navigation
+    const otpInputs = document.querySelectorAll('.otp-input');
+    otpInputs.forEach((input, index) => {
+      input.addEventListener('input', function(e) {
+        if (this.value.length === 1 && index < otpInputs.length - 1) {
+          otpInputs[index + 1].focus();
+        }
+      });
+
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value === '' && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+    });
+
+    // Verify OTP
+    document.getElementById('verifyOtpBtn').addEventListener('click', function() {
+      const enteredOTP = Array.from(otpInputs).map(input => input.value).join('');
+      const errorDiv = document.getElementById('otpError');
+      const successDiv = document.getElementById('otpSuccess');
+
+      errorDiv.style.display = 'none';
+      successDiv.style.display = 'none';
+
+      if (enteredOTP === currentOTP) {
+        const user = authorizedUsers.find(u => u.email.toLowerCase() === otpEmail.toLowerCase());
+        currentUser = user;
+        
+        successDiv.textContent = 'Login successful!';
+        successDiv.style.display = 'block';
+        
+        setTimeout(() => {
+          showApp();
+        }, 500);
+      } else {
+        errorDiv.textContent = 'Invalid OTP. Please try again.';
+        errorDiv.style.display = 'block';
+        otpInputs.forEach(input => input.value = '');
+        otpInputs[0].focus();
+      }
+    });
+
+    // Resend OTP
+    document.getElementById('resendOtpLink').addEventListener('click', function() {
+      currentOTP = generateOTP();
+      console.log('New OTP: ' + currentOTP);
+      alert('New OTP Generated: ' + currentOTP + '\n(In production, this will be sent via email)');
+      
+      const successDiv = document.getElementById('otpSuccess');
+      successDiv.textContent = 'New OTP sent!';
+      successDiv.style.display = 'block';
+      
+      setTimeout(() => {
+        successDiv.style.display = 'none';
+      }, 3000);
+    });
+
+    // Show Application
+    function showApp() {
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('appScreen').style.display = 'block';
+      document.getElementById('userEmail').textContent = currentUser.email;
+      
+      const name = currentUser.name || prompt("Please enter your name:");
+      const greetingDiv = document.getElementById("greeting");
+      if (name && name.trim()) {
+        greetingDiv.textContent = `Hey this is ${name.trim()}... how can I help you today?`;
+      } else {
+        greetingDiv.textContent = "Hey... how can I help you today?";
+      }
+      
+      initializeApp();
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      if (confirm('Are you sure you want to logout?')) {
+        currentUser = null;
+        currentOTP = null;
+        otpEmail = null;
+        
+        document.getElementById('emailInput').value = '';
+        document.getElementById('phoneInput').value = '';
+        otpInputs.forEach(input => input.value = '');
+        
+        document.getElementById('appScreen').style.display = 'none';
+        document.getElementById('otpForm').style.display = 'none';
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('authScreen').style.display = 'flex';
+      }
+    });
+
+    // Initialize Main Application
+    function initializeApp() {
+      const mainGroupSelect = document.getElementById("mainGroup");
+      const subGroupSelect = document.getElementById("subGroup");
+      const instructionDiv = document.getElementById("instruction");
+
+      const data = {
+        "Account Details": {
+          subgroups: {
+            "DND Activation": `Apologies to the customer for disturbing them..
+Fill DND form and give TAT 30 days (only for notification and sms) in email? unsubscribe it from email.
+tagging - Account related --> dnd activation`,
+
+            "OTP/PASSWORD": `Apologies to the customer for inconvenience..and ask activate.
+Sir, did you activate the DND? If yes, send an email to (tlchc, sme).
+tagging - Account related --> OTP/ Password issues`,
+
+            "Request to add/edit address": `Guide the customer and inform that we are not able to add location from our side.
+Guide them or help them to add/edit address in the app.
+tagging - account related --> Request to add/edit address`,
+
+            "Request to add/edit Phone no.": `Guide the customer and inform that we are not able to add phone number from our side.
+Guide them or help them to add/edit phone in the app.
+tagging - account related --> Request to add/edit Phone`,
+
+            "Request to delete account": `Try to understand why customer wants to delete the account.
+Guide them if they want to delete the account from their app or send an email to delete it [talktous@licious.com]
+
+Send email to [talktous@licious.com]
+
+Subject: Request to Close Licious Account – Shipment ID: [id]
+
+Hi Team,
+
+The customer has requested to delete or close their Licious account.
+
+Shipment ID: [id]
+
+Kindly take the necessary action.
+
+Regards,
+CHC
+
+tagging - Account related --> Request to delete account`,
+          }
+        },
+
+        "Blank call / call drop / spam": {
+          subgroups: {
+            "Blank call/spam Email/Wrong Number": `Have a look on workbench ... is there any ongoing shipment (using customer number).
+If there is no response from customer:
+Give disclaimer 3 times (I will be forced to disconnect the call).
+Cut and redial the call.
+
+Tagging - Blank Call/Call Drop/Spam --> Blank Call / Spam Email / Wrong Number`,
+            "Call Drop": `If there is any call drop, instantly call back to customer.
+If customer not respond/busy, create ticket/process.
+
+Tagging - SF tagging --> Blank call drop --> call drop`
+          }
+        },
+
+        "Cancellation Related": {
+          subgroups: {
+            "Order Cancellation without consent - Cancelled by Licious": `This time order may be cancelled because of some reasons like POS, Damaged, DE issues, rain, bandh, etc.
+
+Apologise for inconvenience:
+"Unfortunately, due to unforeseen operational issues, we were unable to fulfill your order as originally planned. We deeply regret any inconvenience this may have caused you."
+
+Give them refund TAT 3 to 5 working days.
+
+tagging - cancellation related --> order cancelled without consent`,
+
+            "Order Cancellation without consent - Cancelled by Customer": `If the order is cancelled because customer was not reachable:
+
+Apologise for inconvenience:
+"It's showing our DE tried to reach you several times but due to improper call connectivity, he had to cancel the order."
+
+In case of prepaid order, refund will be initiated to source TAT 3 to 5 working days, in Licious wallet 24 hours.
+
+tagging - cancellation related --> order cancelled without consent`,
+
+            "Changed mind [ssi]": `Customer decided to cancel the entire order [he/she changed their mind] [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> change mind`,
+
+            "Add/remove item": `We cannot add items; we only remove items and cancel [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> forgot to add/remove item`,
+
+            "Forgot to apply coupon": `We can apply a coupon on behalf of customer [before billed]. After bill, if customer wants to cancel the order [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> forgot to apply coupon`,
+
+            "Order got split": `The order already got split by the app. Now customer wants to cancel the order [before billed] [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> order split in different slot`,
+
+            "Preferred slot unavailable": `Customer placed an order but wants to change it to a different slot which is not available [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> slot unavailable to reschedule`,
+
+            "Customer Not available": `Customer is not available to take the order, so they cancel the order [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> not available to receive order`,
+
+            "Chose a wrong Address": `Customer chose a wrong address by mistake; they cancel the order [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> chose a wrong address`,
+
+            "Payment Failed": `Due to some technical issue, the payment failed [cancel fee applies].
+
+Tagging - Cancellation related --> customer factors --> payment failed`,
+
+            "Order Rescheduled [li]": `The order was rescheduled due to bandh, DE not available, hub infrastructure, etc. Apologies for inconvenience.
+
+We regret to inform you this your order has been rescheduled to (new slot) due to unforeseen operational issues.
+
+Our team tried to contact you to give reschedule information by call and SMS.
+
+Tagging - cancellation related --> order cancellation licious factors`,
+
+            "Order Modification[li]": `Imagine you ordered 2 chicken; one scheduled for today and one for tomorrow.
+
+Check the reason for modification [Product OFS / Damaged cases]. If shipment is ongoing and customer wants to cancel due to order modification, cancel the entire order.
+
+Tagging - cancellation related --> order cancellation licious factors --> order modification`,
+
+            "Delivery is Delayed [li]": `If order got delayed and customer is asking "Where is my order?" Check status if "Processing / Accepted / Billed". Call hub or AM and escalate ASAP if no response.
+
+If customer is not convinced with TAT, offer initial refund.
+
+Tagging - cancellation related --> order cancellation licious factors --> delivery is delayed`
+          }
+        },
+
+        "Customer Support Feedback": {
+          subgroups: {
+            "Ambassador Appreciation": `Take the customer number.  
+Thank the customer for the appreciation towards the ambassador.  
+Inform the customer the appreciation will be shared.
+
+Email to TL, SME and QA in cc of the mail.
+
+Subject: Customer Appreciation for [Colleague's Name] as CHC Ambassador
+
+hi team,
+
+I wanted to inform you that during a recent call with a customer, they expressed their appreciation for [Colleague's Name] and commended their efforts as a CHC Ambassador. The customer specifically mentioned
+
+It's great to see such positive recognition,
+
+Regards,  
+[Your Name]
+chc
+SF tagging --> customer support feedback --> ambassador appreciation`,
+
+            "CHC Ambassador Complain Related": `Take the customer number.  
+Apologize and check the previous ambassador details.  
+Inform the customer the necessary action will be taken and check what was the concern the customer was facing and provide the resolution accordingly.  
+Collect the ambassador details.
+
+Email team leader and assistant manager mentioning about the customer's feedback.
+
+Subject: Customer Complaint Regarding CHC Ambassador
+
+hi team,
+
+I would like to bring to your attention that during a recent call, a customer raised a complaint concerning the conduct/performance of the CHC Ambassador. The customer expressed dissatisfaction with our service.
+
+Best regards,  
+[Your Name]  
+CHC
+
+SF tagging --> customer support feedback --> ambassador complain`
+          }
+        },
+
+        "Delivery": {
+          subgroups: {
+            "Delivery Executive appreciation": `Thank the customer for the feedback... the feedback will be shared with the team.
+
+Delivery Executive name appreciation [shipment id , voc]
+Email - to hub
+
+Subject: Delivery Executive Name Appreciation
+
+Hi team,
+
+I would like to inform you that we received a call from a customer expressing appreciation for the efforts and professionalism of our delivery executive, [Delivery Executive's Name]. The customer was particularly pleased with [any specific positive details if available].
+
+Best regards,  
+Shipment ID:  
+CHC
+
+Tagging - General Query -> delivery related -> DE Appreciation`,
+
+            "Delivery Address Related": `
+* Order delivered to incorrect address
+
+Apologies to customer for placing the order in wrong place.
+
+Cross check the actual order customer received and ask DE and check where he has delivered the product. Take TAT, give TAT (No TAT give 30 min).
+
+Tagging -> order related --> Delivery Address Related --> Order delivered to incorrect address
+
+* Request to deliver at a different location address
+
+Customer requesting to edit address and location (No we can't).
+
+Tagging - Delivery address related --> Request to deliver at different location`,
+
+            "Delivery Executive complaint": `
+* DE bad Behaviour
+
+Apologise to customer… assure that we will work on this and this won't happen again.
+
+Report grievance in Delivery E complain / behaviour issues / Delivery rating.
+
+Email - hub, tlchc
+
+Subject: Customer Complaint Regarding Delivery Executive
+
+Hi team,
+
+I would like to inform you that we received a call from a customer regarding a complaint about the conduct/performance of the delivery executive, [Delivery Executive's Name if known]. The customer expressed concerns about [briefly describe the nature of the complaint, if available].
+
+Please advise on the next steps or if any further action is required from my side.
+
+Best regards,  
+Shipment ID:  
+CHC
+
+Tagging - Delivery related --> delivery executive complaint --> Delivery executive Rude --> misbehavior --> request for delivery rating`,
+
+            "Marked delivered not delivered": `Apologies to customer, ask probing questions:  
+- Is your address correct?  
+- Did you receive any call from DE?  
+- Have you checked your doorstep?  
+- Check with family members if they collected  
+- Can you check your society gate?
+
+Contact DE/Hub manager, take TAT and give TAT. If no TAT, escalate ASAP.
+
+Fill grievance.
+
+Email - hub, Tlchc, sme
+
+If convinced:  
+Hi Team,  
+
+The customer contacted CHC and complained that the shipment was marked as delivered but he had not got the products yet. We are unable to establish any contact with Delivery Hero, request that you please prioritize and deliver the shipment as soon as possible.
+
+Customer Registered phone number:  
+Shipment Id:  
+
+Regards,  
+CHC
+
+If refunded:  
+Hi Team,  
+
+A customer contacted CHC and complained that the shipment was marked as delivered but he had not got the products yet. We have issued a complete refund for the customer as per their request; kindly notify the Delivery Hero not to deliver the product to the customer.
+
+Customer Registered phone number:  
+Shipment Id:  
+
+Regards,  
+CHC
+
+Tagging - Delivery related --> MDND --> Licious Delivery`,
+
+            "Partial Order received": `Apologise to the customer and ask which product is missing. Did they open the box?
+
+Contact DE / hub manager / AM (Response? -> take TAT, give TAT. No response? -> ASAP).
+
+Send email to hub, cc tlchc, sme / refund.
+
+if agree 
+Hi Team,
+
+A customer contacted CHC and complained that a [item name] in the order were missing. but customer want that product so try to delivered it ASAP
+Customer Registered phone number:
+Shipment Id:
+Missing Products:
+
+Regards,
+CHC
+
+
+if Refunded 
+Hi Team,  
+
+A customer contacted CHC and complained that a [item name] in the order were missing. We have issued a partial refund for the customer as per their request; kindly notify the Delivery Hero not to deliver the product to the customer.
+
+Customer Registered phone number:  
+Shipment Id:  
+Missing Products:  
+
+Regards,  
+CHC
+
+Tagging --> delivery related -> parcel orders delivered`,
+
+            "Preferred Delivery slot not available": `If customer did not find preferred slot to order, check in workbench (if available place order for customer; otherwise inform customer preferred slot is not available; they can order in a different slot only).
+
+Tagging - Delivery --> Preferred Delivery slot not available.`,
+
+            "Request to add delivery instructions": `* Landmark  
+If landmark is not reflecting on Workbench then send an email to the hub with details from the customer.
+
+Email - HUB
+
+Subject: Customer Landmark Request
+
+Hi Team,
+
+I would like to bring to your attention a customer request regarding a specific landmark for delivery: [LANDMARK]. The customer has provided additional landmark details to ensure accurate and timely delivery.
+
+Please update the relevant records accordingly and ensure the delivery team is informed.
+
+Thank you for your support.
+
+Best regards,  
+Shipment Id:  
+CHC
+
+If the order is out for delivery, call the Delivery executive and keep them posted with landmark details.
+
+Tagging --> Delivery related → Request to add delivery instructions → Landmark provided`,
+
+            "Wrong product delivered": `* This is the very first call from the customer to complain that wrong product delivered.
+
+Apologies to customer and confirm the product label name and check in workbench.  
+If the product is wrong, call DE/HUB/AM and ask for TAT, then give TAT.
+
+Send grievance and email to HUB/cc tlchc.
+
+Hi Team,  
+
+The customer contacted CHC and complained that wrong product was delivered. We are unable to establish any contact with Delivery Hero, request that you please prioritize and deliver the missing items as soon as possible.
+
+Shipment Id:  
+Actual product:  
+Wrong product:  
+
+Regards,  
+CHC
+
+If refunded:  
+
+Hi Team,  
+
+A customer contacted CHC and complained that wrong product was delivered. We have issued a refund for wrong product delivered as per customer request; kindly notify the Delivery Hero not to deliver the wrong product to the customer.
+
+Delivery Issues
+
+Shipment Id:  
+Actual Product:  
+Wrong Product:
+
+Regards,  
+CHC
+
+Fill grievance and send email.
+
+Tagging - Wrong product delivered`
+          }
+        } , "Order Tracking": {
+        subgroups: {
+          "Order Tracking - within SLA": `If order is not dispatched, do not call HUB/DE. Inform the customer that the order will be delivered as per regular ETA.
+
+If dispatch, do not call HUB/DE. Inform the customer that it will be delivered as per regular ETA.
+
+Tagging: Order Related -> Order Tracking ->`,
+
+          "15 min before outside SLA": `If 15 mins still remain till end of delivery slot and order is not dispatched, inform the customer that the order is not dispatched and call the Hub.  
+If call gets connected, take TAT and give TAT.
+
+Else inform the customer that we can’t give a TAT for now.
+
+Send email HUB.
+
+If order got dispatched, do not call Hub/DE; inform the order is dispatched and share the TAT seen on the workbench.
+
+Send email HUB.
+
+Tagging: Order Related -> Order Tracking ->`,
+
+          "Order Tracking - outside SLA": `If order is still not dispatched, inform the customer that the order is still not dispatched. Call the HUB (if connected, take TAT and give TAT; if not connected, don’t inform the customer and say we can’t give TAT for now).
+
+Send email HUB.
+
+Else if order is dispatched, inform the customer order is dispatched. Call the DE (if response, take TAT and give TAT; if no response, we can’t give TAT).
+
+Send email HUB.`
+        }
+      },
+      "Payment Related": {
+        subgroups: {
+          "COD/POD": `Apologies to customer and inform that we don't have Cash on Delivery. We are moving towards digital payment methods.
+
+Tagging - payment related --> cod/pod related`,
+
+          "Money Debited Order Not Placed": `Apologies to customer and check in workbench (payment method Razorpay/PTM/etc.).
+
+Check in Razorpay if the payment is created (wait for 7 min), authorized, stuck in gateway (auto refunded in 10 mins), captured payment is received, failed payment got failed, refunded payment good refunded already.
+
+Tagging - payment related -> money debited order not placed`,
+
+          "Multiple payments": `Apologies to customer and check in workbench (then Razorpay) if double payment happened, initiate full refund form.
+
+Tagging - payment related --> Multiple payments`,
+
+          "Payment failed": `Apologies to customer and educate them that the payment failed, your money is safe and will be refunded in 24-48 hrs.
+
+Tagging - payment related --> payments failed`,
+
+          "Payment page too slow": `Apologies to customer and check if there is any issue from our side. Also mention to check net connectivity to customer.
+
+Send email to - Tlchc
+
+Payment issue:  
+Customer’s contact no:  
+Issue:
+
+Tagging - payment related --> Payment page too slow`,
+
+          "Preferred payment mode not available": `Apologies to customer and provide them information that we have these online methods to pay, but take it as feedback and share with the relevant team.
+
+Tagging - payment related --> Preferred payment mode not available`,
+
+          "Payment link Request": `Apologies to customer and inform that we don't have payment link method for now, but take it as feedback and share with my team.
+
+Tagging - payment related --> Preferred payment link`,
+
+          "Wallet DE-link": `Apologies to customer and guide them to de-link other wallets from apps:
+
+Amazon Pay --> Account --> Login at other apps --> Linked apps (remove it)
+
+Tagging - payment related --> Wallet delink query`
+        }
+      }
+      ,
+
+      "Pricing & Billing Related": {
+        subgroups: {
+          "Extra Grammage Charge": `Inform the customer we don't charge for extra grammage.  
+If customer paid online and received less grammage, check the invoice in workbench and refund the amount if customer is eligible.
+
+Tagging - Pricing & Billing related --> Extra Grammage received`,
+
+          "Grammage enquiry": `"The grammage difference is caused due to processing of the meat."  
+At Licious, we have standard cuts and do not compromise on them.  
+We may deliver more grammage but never less grammage.
+
+If less grammage is delivered, we will process the extra charged amount to Licious cash wallet within 24hrs of delivery.
+
+Salesforce ticket with tagging - Pricing & Billing related --> Grammage enquiry`,
+
+          "Less Grammage received": `Apologies to the customer and with help of invoice educate them that if there is any less grammage received,  
+it will auto refund to your Licious cash within 24 hr after delivery.
+
+Tagging - Pricing & Billing related --> Less Grammage received`,
+
+          "Inconsistency in price during checkout": `Apologies to the customer. Try ordering the same product (to check if there is any glitch on our side).  
+Guide them to place the order and refund the extra amount to Licious cash with TL approval.
+
+Send email - TL/SME
+
+Subject: Inconsistency in price during checkout
+
+Hi team,
+
+A customer is facing price fluctuation issues during placing an order.
+
+Shipment id:  
+Product details:  
+Attached image:  
+Issue:
+
+If extra charges exist like delivery charges, guide and inform customer accordingly.`,
+
+          "Invoice Unclear": `Apologies to the customer and check in workbench if the amount has been charged correctly after discount.  
+If customer wants invoice, send invoice.
+
+If mismatch exists, after confirmation refund the extra amount customer paid.
+
+Salesforce ticket with tagging - Pricing & Billing related --> Invoice unclear`,
+
+          "Product too expensive": `Apologies for inconvenience.  
+"I totally understand your concern sir... but we charge for actual product which is good in quality and hygiene.  
+Licious meat is freshest; all products are steroid-free and chemical-free.  
+We only charge for net weight, so price may appear a little expensive."
+
+Salesforce ticket with tagging - Pricing & Billing related --> Product too expensive`,
+
+          "Sudden increase in product price": `I understand your concern sir. Our prices remain competitive, with slight increase due to quality selection and local demand.  
+We don’t charge for wastage.  
+But for now, I take it as feedback to be shared with the relevant team.`,
+
+          "Unable to view/download Invoice": `Fetch the shipment ID (using mobile no.). If you can view the invoice, share it with the customer.  
+Also guide the customer that from the app/web they can select "My Order" from the list of orders, select and view details, scroll below.
+
+Salesforce ticket with tagging - Pricing & Billing related --> Unable to view/download invoice`
+        }
+      } , "Product Quality" :{
+  subgroups: {
+    " Cut Issues/Bone Meat Ratio/ Size/Meatiness/Specification issue": `Apologies to the customer and try to understand their concern.
+
+If complaint is about SMALL or LARGE pieces:
+- Confirm total number of pieces received in that net weight; if it matches website description, it is the right product. Educate the customer accordingly.
+- Confirm label details to ensure HUB has delivered the right product; if label is correct but pack has less/more pieces, it is a quality issue.
+
+Bone Meat Ratio, bony & boneless pieces:
+- Lamb & Goat meat bony: 70% bone-in, 30% boneless
+- If post cooking, probe for cooking time (7+ whistles = overcooked)
+- Hyderabad: 65% bone-in, 35% boneless
+
+If complaint is about LESS number of pieces:
+- Confirm label details and net weight.
+- If mismatch, report GRIV & FIR in Workbench with product and damaged quantity details.`,
+
+    "Cleanliness Issue/High Drip/": `Apologies to the customer and try to understand their concern.
+
+Product info:
+- Blood drip or Fat/skin not trimmed: Educate customers skin on wings not completely trimmed for Chicken category.
+- For first-time Licious customers, explain myoglobin causes red color.
+- Prawns not deveined: only upper vein removed, lower vein safe to consume.
+
+Raise Grievance in Workbench with category Cleanliness Issue.`,
+
+    tasteIssues: `Apologies to the customer and try to understand their concern.
+
+Product info:
+- Frozen meat texture will be hard.
+- Chicken takes 20-25 minutes for cooking.
+- Mutton takes 5-6 whistles.
+
+Raise Grievance in Workbench with category Taste Issues.`,
+
+    productDamage: `Product info:
+- Marinades and Whole Chicken not vacuum packed.
+- Fish & seafood loosely vacuum packed.
+- Check Kebabs use within UBD and storage in chilled.
+- Educate customer to use within Use By Date and follow cooking instructions.
+
+Raise Grievance in Workbench with category Product Damaged.`,
+
+    healthIssues: `Apologies and ask:
+- Did you consume the product before expiry?
+- Did you notice any bad smell?
+
+Fill grievance. If refund eligible, pitch for refund. Otherwise assure escalation.
+
+Raise Grievance in Workbench with category Health Issues.`,
+
+    " Contamination/Spoilage": `Apologies and arrange reverse pickup (except Kolkata).
+
+Give refund based on refund type.
+
+Raise Grievance in Workbench with category Contamination.
+
+Send email to hub, cc city-quality, tlchc, sme:
+Subject: PQ issue - Reverse Pickup [shipment id]
+Body:
+Please arrange reverse pickup.
+Shipment Id:
+SKU name:
+Customer phone:`,
+
+    "Discoloration/Appearance": `Product info:
+- Confirm if discoloration observed before or after opening.
+- Inform customer color variation can be breed-dependent.
+
+Raise Grievance in Workbench with category Discoloration.`,
+
+    "Expired Product/Shelf Life": `Please refer customer to the Shelf Life Chart below for product shelf life information.`,
+
+    texture: `Apologies and ask customer to explain the texture concern.
+
+If understanding issue, educate; else raise grievance.
+
+Raise Grievance in Workbench with category Texture.`,
+
+    "Packaging Damaged/Sealing Issues/Vaccum Loss/Labelling related": `Product info:
+- Marinades and Whole Chicken not vacuum packed.
+- Fish and Seafood loosely vacuum packed.
+
+Raise Grievance in Workbench with category Packaging Damage.`,
+
+    " Smell Issues/Freshness/Temperature": `If understanding issue, educate customer; else raise grievance.
+
+Raise Grievance in Workbench with category Smell Issues.`
+  }
+} , 
+      };
+
+      // Populate main groups dropdown
+      function populateMainGroups() {
+        mainGroupSelect.innerHTML = '<option value="">-- Select Main Group --</option>';
+        Object.keys(data).forEach(mainGroup => {
+          const option = document.createElement("option");
+          option.value = mainGroup;
+          option.textContent = mainGroup;
+          mainGroupSelect.appendChild(option);
+        });
+        mainGroupSelect.style.display = "inline-block";
+      }
+
+      // Populate subgroups dropdown
+      function populateSubGroups(mainGroup) {
+        subGroupSelect.innerHTML = '<option value="">-- Select Sub Group --</option>';
+        if (mainGroup && data[mainGroup]) {
+          const subgroups = data[mainGroup].subgroups;
+          Object.keys(subgroups).forEach(sub => {
+            const option = document.createElement("option");
+            option.value = sub;
+            option.textContent = sub;
+            subGroupSelect.appendChild(option);
+          });
+          subGroupSelect.style.display = "inline-block";
+        } else {
+          subGroupSelect.style.display = "none";
+          instructionDiv.textContent = "";
+        }
+      }
+
+      // Event handlers
+      mainGroupSelect.addEventListener("change", () => {
+        instructionDiv.textContent = "";
+        populateSubGroups(mainGroupSelect.value);
+      });
+
+      subGroupSelect.addEventListener("change", () => {
+        const mainGroup = mainGroupSelect.value;
+        const subGroup = subGroupSelect.value;
+        if (mainGroup && subGroup) {
+          instructionDiv.innerHTML = data[mainGroup].subgroups[subGroup]
+            .replace(/\[li\]/g, '<span class="li-factor">[li factor]</span>')
+            .replace(/\[ssi\]/g, '<span class="customer-factor">[customer factor]</span>');
+        } else {
+          instructionDiv.textContent = "";
+        }
+      });
+
+      // Initialize dropdowns
+      populateMainGroups();
+
+      // Egg Damage Calculator
+      document.getElementById('calculateBtn').addEventListener('click', function() {
+        const orderValue = parseFloat(document.getElementById('orderValue').value);
+        const packageOption = parseInt(document.getElementById('packageOption').value);
+        const damagedEggs = parseInt(document.getElementById('damagedEggs').value);
+        const resultDiv = document.getElementById('calc-result');
+
+        if (isNaN(orderValue) || isNaN(damagedEggs) || orderValue <= 0 || damagedEggs < 0) {
+          resultDiv.textContent = 'Please enter valid values';
+          resultDiv.style.color = '#e74c3c';
+          return;
+        }
+
+        if (damagedEggs > packageOption) {
+          resultDiv.textContent = `Damaged eggs cannot exceed package size (${packageOption})`;
+          resultDiv.style.color = '#e74c3c';
+          return;
+        }
+
+        const pricePerEgg = orderValue / packageOption;
+        const refundAmount = (pricePerEgg * damagedEggs).toFixed(2);
+
+        resultDiv.innerHTML = `
+          <strong>Calculation Result:</strong><br>
+          Price per egg: ₹${pricePerEgg.toFixed(2)}<br>
+          Damaged eggs: ${damagedEggs}<br>
+          <strong>Refund Amount: ₹${refundAmount}</strong>
+        `;
+        resultDiv.style.color = '#27ae60';
+      });
+    }
