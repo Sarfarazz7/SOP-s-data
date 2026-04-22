@@ -20,6 +20,20 @@
       background: linear-gradient(135deg, #fff 0%, #e74c3c 100%);
     }
 
+    .workflow-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 15px 0; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      overflow: visible;
+    }
+
     .auth-container {
       background: white;
       padding: 40px;
